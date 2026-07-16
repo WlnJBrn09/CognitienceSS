@@ -1,0 +1,39 @@
+{
+  "name": "cognitience-ss",
+  "version": "1.0.0",
+  "description": "The VS Code of spreadsheets — Cognitience SS by Maq-Swarm",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "build": "tsc && npm run copy-assets",
+    "watch": "tsc --watch",
+    "copy-assets": "node scripts/copy-renderer-assets.js",
+    "start": "npm run build && electron .",
+    "dev": "npm run build && electron .",
+    "package": "electron-builder",
+    "package:win": "electron-builder --win",
+    "package:mac": "electron-builder --mac",
+    "package:linux": "electron-builder --linux",
+    "dist": "npm run package"
+  },
+  "author": "Maq-Swarm",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Maq-Swarm/cognitience-ss.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Maq-Swarm/cognitience-ss/issues"
+  },
+  "homepage": "https://github.com/Maq-Swarm/cognitience-ss#readme",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.0"
+  }
+}
