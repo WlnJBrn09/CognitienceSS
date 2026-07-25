@@ -1,8 +1,11 @@
-node_modules/
-dist/
-release/
-out/
-*.js.map
+/target
+/node_modules
+/dist
+/build/_icon_sizes
+*.log
 .DS_Store
 Thumbs.db
-*.log
+.env
+documents/*.json
+!documents/.gitkeep
+*.tmp

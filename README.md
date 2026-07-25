@@ -1,67 +1,102 @@
-# Cognitience SS
+# Cognition SS
 
-**The VS Code of spreadsheets.**
+Local-first spreadsheet with an Apple-inspired liquid-glass UI and a **Rust** backend.
 
-Cognitience SS is a modern desktop spreadsheet built with Electron and TypeScript. Part of the Cognitience suite — same design language and theming as [Cognitience WP](https://github.com/Maq-Swarm/cognitience-wp).
+Nothing is uploaded to the cloud. Workbooks are JSON files on disk. Open **xlsx**, **csv**, and **parquet** from your Documents folder.
+
+## Requirements
+
+- Rust 1.75+ (`cargo`)
+- Node.js 18+ (for Electron packaging)
+- A modern browser (Chrome, Edge, Firefox, Safari)
+
+## Desktop app (Electron)
+
+```bash
+cargo build --release
+npm install
+npm run dist
+```
+
+Output: `dist/CognitienceSS_v2.0.0.exe` (portable)
+
+## Run (dev server)
+
+```bash
+cargo run
+```
+
+Then open **http://127.0.0.1:8788**
+
+```bash
+npm run electron:dev   # Electron shell + release backend
+```
+
+Optional environment variables:
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `PORT` | `8788` | HTTP port (localhost only) |
+| `COGNITION_DATA_DIR` | `./documents` | Where `.json` workbooks are stored |
+| `COGNITION_STATIC_DIR` | `./static` | Frontend assets |
+| `COGNITION_DOCS_DIR` | user Documents | Folder scanned for xlsx/csv/parquet |
 
 ## Features
 
-- **Spreadsheet grid** — 50×26 cells, expandable via insert row/column
-- **Safe formula engine** — Tokenizer + recursive-descent evaluator (no `eval`); dependency graph with `#CIRCULAR!` detection; 20+ functions (SUM, AVERAGE, IF, CONCAT, …)
-- **Cell formatting** — Bold, italic, underline, strikethrough, fonts, text/background color, alignment, number formats
-- **Merge, sort & filter** — Merge/unmerge selection, sort A→Z / Z→A, auto-filter
-- **Find & replace** — Ctrl+F / Ctrl+H
-- **Freeze panes** — Freeze at the active cell
-- **4 themes** — Cognitience Light, Dark (Catppuccin Mocha–inspired), Sepia, High Contrast Dark
-- **Multi-sheet workbooks** — Add, rename, delete, duplicate, reorder
-- **Undo/redo** — Up to 100 levels
-- **File I/O** — Native `.cogss`, CSV/TSV/JSON, Excel `.xlsx`/`.xls` import & export, HTML & PDF export
-- **Auto-save** — After 3 seconds of inactivity (when a file path exists)
-- **Command palette** — Ctrl+Shift+P
-- **Print, settings & shortcuts** — From the application menu
+- Clean sheet UI (no cloud icon, Share/Upgrade, Google side panel, or menubar clutter)
+- **Left sidebar**: New Document, Open Document, and live list of xlsx / csv / parquet
+- Correct open/display for **Excel (.xlsx)**, **CSV/TSV**, and **Parquet**
+- Formula bar with basic `=SUM()`, arithmetic, and cell references
+- Export to `.xlsx`, `.csv`, `.tsv`, `.json`
+- Liquid-glass chrome; solid grid for legibility
+- Dark mode toggle
 
-## Architecture
+## Project layout
 
 ```
-cognitience-ss/
-├── src/
-│   ├── main/           # Electron main process
-│   ├── preload/        # contextBridge API
-│   ├── renderer/       # UI (HTML/CSS + ES modules)
-│   │   ├── js/         # Spreadsheet engine & UI modules
-│   │   └── css/
-│   └── shared/         # Types & constants
-├── resources/
-├── scripts/
-└── .github/workflows/
+cognition-ss/
+├── build/           # App icons
+├── dist/            # Packaged Electron builds
+├── documents/       # Local workbook JSON store
+├── electron/        # Electron shell
+├── scripts/         # Icon helper
+├── src/             # Rust backend (Axum)
+│   ├── documents.rs
+│   ├── export.rs
+│   ├── files.rs
+│   └── main.rs
+├── static/          # Frontend
+│   ├── assets/logo.png
+│   ├── vendor/
+│   ├── index.html
+│   ├── liquid-glass.js
+│   ├── script.js
+│   └── style.css
+├── Cargo.toml
+└── package.json
 ```
 
-## Getting Started
+## API (local only)
 
-### Prerequisites
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/health` | Health + local-mode flag |
+| `GET` | `/api/documents` | List workbooks |
+| `POST` | `/api/documents` | Create |
+| `GET` | `/api/documents/{id}` | Load |
+| `PUT` | `/api/documents/{id}` | Save |
+| `DELETE` | `/api/documents/{id}` | Delete |
+| `GET` | `/api/files` | List xlsx/csv/parquet in Documents |
+| `POST` | `/api/files/open` | Open relative path from Documents |
+| `POST` | `/api/files/import` | Upload/import a file |
+| `POST` | `/api/export` | Export workbook |
 
-- Node.js 18+ and npm
+## Shortcuts
 
-### Install & Run
-
-```bash
-git clone https://github.com/Maq-Swarm/cognitience-ss.git
-cd cognitience-ss
-npm install
-npm run build
-npm start
-```
-
-### Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Compile TypeScript and copy renderer assets |
-| `npm start` / `npm run dev` | Build and launch Electron |
-| `npm run watch` | TypeScript watch mode |
-| `npm run package` / `npm run dist` | Package with electron-builder |
-| `npm run package:win` | Windows NSIS + portable |
-
-## License
-
-MIT © Maq-Swarm
+| Key | Action |
+| --- | --- |
+| Ctrl+S | Save |
+| Ctrl+Z / Ctrl+Y | Undo / Redo |
+| Arrow keys | Move selection |
+| Enter / F2 | Edit cell |
+| Delete | Clear cell |

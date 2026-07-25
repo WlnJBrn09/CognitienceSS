@@ -1,39 +1,80 @@
 {
   "name": "cognitience-ss",
-  "version": "1.0.0",
-  "description": "The VS Code of spreadsheets — Cognitience SS by Maq-Swarm",
-  "main": "dist/main/index.js",
-  "scripts": {
-    "build": "tsc && npm run copy-assets",
-    "watch": "tsc --watch",
-    "copy-assets": "node scripts/copy-renderer-assets.js",
-    "start": "npm run build && electron .",
-    "dev": "npm run build && electron .",
-    "package": "electron-builder",
-    "package:win": "electron-builder --win",
-    "package:mac": "electron-builder --mac",
-    "package:linux": "electron-builder --linux",
-    "dist": "npm run package"
-  },
-  "author": "Maq-Swarm",
+  "version": "2.0.0",
+  "description": "Cognitience SS — local-first spreadsheet with liquid glass UI and Rust backend",
+  "main": "electron/main.js",
+  "author": "Cognitience",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Maq-Swarm/cognitience-ss.git"
+  "private": true,
+  "scripts": {
+    "backend": "cargo run --release",
+    "backend:build": "cargo build --release",
+    "start": "cargo run",
+    "electron": "electron .",
+    "electron:dev": "cargo build --release && electron .",
+    "icon": "node scripts/make-icon.js",
+    "dist": "cargo build --release && node scripts/make-icon.js && electron-builder --win portable",
+    "dist:dir": "cargo build --release && node scripts/make-icon.js && electron-builder --win dir"
   },
-  "bugs": {
-    "url": "https://github.com/Maq-Swarm/cognitience-ss/issues"
-  },
-  "homepage": "https://github.com/Maq-Swarm/cognitience-ss#readme",
-  "dependencies": {
-    "js-yaml": "^4.1.0",
-    "xlsx": "^0.18.5"
+  "build": {
+    "appId": "com.cognitience.ss",
+    "productName": "Cognitience SS",
+    "copyright": "Copyright © Cognitience",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "target/release/cognition-ss.exe",
+        "to": "backend/cognition-ss.exe"
+      },
+      {
+        "from": "static",
+        "to": "static"
+      },
+      {
+        "from": "build/icon.ico",
+        "to": "build/icon.ico"
+      }
+    ],
+    "extraFiles": [
+      {
+        "from": "build/icon.ico",
+        "to": "icon.ico"
+      }
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "CognitienceSS_v${version}.${ext}",
+      "signAndEditExecutable": true
+    },
+    "portable": {
+      "artifactName": "CognitienceSS_v${version}.${ext}"
+    },
+    "asar": true,
+    "compression": "maximum",
+    "electronLanguages": ["en-US"]
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^22.0.0",
-    "electron": "^33.4.11",
+    "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
-    "typescript": "^5.7.0"
+    "png-to-ico": "^2.1.8"
+  },
+  "allowScripts": {
+    "electron@33.2.1": true,
+    "electron@33.4.11": true
   }
 }
