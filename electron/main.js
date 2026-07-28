@@ -23,12 +23,17 @@ function isPackaged() {
   return app.isPackaged;
 }
 
+function backendName() {
+  return process.platform === 'win32' ? 'cognition-ss.exe' : 'cognition-ss';
+}
+
 function backendBinary() {
+  const name = backendName();
   if (isPackaged()) {
-    return path.join(process.resourcesPath, 'backend', 'cognition-ss.exe');
+    return path.join(process.resourcesPath, 'backend', name);
   }
-  const release = path.join(__dirname, '..', 'target', 'release', 'cognition-ss.exe');
-  const debug = path.join(__dirname, '..', 'target', 'debug', 'cognition-ss.exe');
+  const release = path.join(__dirname, '..', 'target', 'release', name);
+  const debug = path.join(__dirname, '..', 'target', 'debug', name);
   if (fs.existsSync(release)) return release;
   return debug;
 }
@@ -119,11 +124,13 @@ function stopBackend() {
 
 function appIconPath() {
   const candidates = [
-    // Packaged resources first (reliable for taskbar while running)
+    process.resourcesPath ? path.join(process.resourcesPath, 'build', 'icon.icns') : null,
+    process.resourcesPath ? path.join(process.resourcesPath, 'build', 'icon.png') : null,
     process.resourcesPath ? path.join(process.resourcesPath, 'build', 'icon.ico') : null,
     process.resourcesPath ? path.join(process.resourcesPath, 'static', 'assets', 'logo.png') : null,
-    // Next to the executable (portable / win-unpacked)
     process.execPath ? path.join(path.dirname(process.execPath), 'icon.ico') : null,
+    path.join(__dirname, '..', 'build', 'icon.icns'),
+    path.join(__dirname, '..', 'build', 'icon.png'),
     path.join(__dirname, '..', 'build', 'icon.ico'),
     path.join(__dirname, '..', 'static', 'assets', 'logo.png'),
   ].filter(Boolean);
